@@ -3,17 +3,35 @@ import subprocess
 from src.machine import Machine, logger
 
 def get_machines():
+    valid_os = ["linux", "ubuntu", "centos", "windows", "macos"]
     machines = []
+    
     while True:
-        name = input("enter the machine's name (write f to finish!): ")
+        name = input("Enter machine name (or 'f' to finish): ").strip()
         if name.lower() == "f":
             break
-        os = input("enter the machine's os: ")
-        cpu = input("enter the machine's cpu: ")
-        ram = input("enter the machine's RAM: ")
+        if not name:
+            print("[ERROR] Machine name cannot be empty.")
+            continue
+
+        os = input("Enter OS (Linux/Ubuntu/CentOS/Windows/macOS): ").strip()
+        if os.lower() not in valid_os:
+            print(f"[ERROR] Invalid OS. Choose from: {', '.join(valid_os)}")
+            continue
+
+        try:
+            cpu = int(input("Enter CPU cores (positive integer): "))
+            ram = int(input("Enter RAM in GB (positive integer): "))
+            if cpu <= 0 or ram <= 0:
+                print("[ERROR] CPU and RAM must be greater than 0.")
+                continue
+        except ValueError:
+            print("[ERROR] CPU and RAM must be valid numbers.")
+            continue
 
         machine = Machine(name, os, cpu, ram)
         machines.append(machine.to_dict())
+        
     return machines
 
 def run_setup_script():
